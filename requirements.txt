@@ -1,0 +1,9 @@
+pandas
+numpy
+requests
+beautifulsoup4
+polygon-api-client
+tweepy
+psutil
+matplotlib
+python-dotenv

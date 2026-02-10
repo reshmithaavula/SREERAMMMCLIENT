@@ -1,0 +1,224 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  /* Professional Financial Light Theme */
+  --background: #f4f7f9;
+  --sidebar-bg: #ffffff;
+  --card-bg: #ffffff;
+  --card-border: #e1e6ed;
+
+  --text-primary: #12151a;
+  --text-secondary: #4a5568;
+  --text-tertiary: #718096;
+
+  /* Financial Accents - Adjusted for Light Background */
+  --accent-green: #008f5d;
+  --accent-green-rgb: 0, 143, 93;
+  --accent-red: #d93025;
+  --accent-red-rgb: 217, 48, 37;
+  --accent-blue: #1a73e8;
+  --accent-gold: #f9ab00;
+
+  --border-color: #e2e8f0;
+  --glass-bg: rgba(255, 255, 255, 0.8);
+  --glass-border: rgba(0, 0, 0, 0.05);
+
+  --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+* {
+  box-sizing: border-box;
+  padding: 0;
+  margin: 0;
+}
+
+html {
+  scroll-behavior: smooth;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+body {
+  background-color: var(--background);
+  color: var(--text-primary);
+  font-family: var(--font-family);
+  overflow-x: hidden;
+  /* Use GPU rasterization for the main body to reduce paint costs */
+  will-change: transform;
+  /* Prevent white flash during momentum scrolling on iOS */
+  -webkit-overflow-scrolling: touch;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+/* GPU Acceleration Utility */
+.gpu-accelerated {
+  transform: translateZ(0);
+  backface-visibility: hidden;
+  perspective: 1000px;
+}
+
+
+
+@keyframes loading-nav {
+  0% {
+    transform: translateX(-100%);
+  }
+
+  50% {
+    transform: translateX(50%);
+  }
+
+  100% {
+    transform: translateX(200%);
+  }
+}
+
+.animate-nav-loading {
+  animation: loading-nav 1.5s infinite ease-in-out;
+}
+
+/* Custom Page Transitions (replaces missing tailwindcss-animate) */
+@keyframes page-enter {
+  0% {
+    opacity: 0;
+    transform: scale(0.98) translateY(10px);
+    filter: blur(4px);
+  }
+
+  100% {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+    filter: blur(0);
+  }
+}
+
+.animate-in {
+  animation: page-enter 0.4s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+  will-change: transform, opacity, filter;
+  backface-visibility: hidden;
+}
+
+/* Glassmorphism Utilities */
+.glass-panel {
+  background: var(--glass-bg);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid var(--glass-border);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+.glass-card {
+  background: var(--card-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  border: 1px solid var(--card-border);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.glass-card:hover {
+  background: rgba(255, 255, 255, 0.05);
+  border-color: rgba(255, 255, 255, 0.15);
+  transform: translateY(-2px);
+  box-shadow: 0 12px 40px -12px rgba(0, 0, 0, 0.5);
+}
+
+/* Typography Enhancements */
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+  letter-spacing: -0.02em;
+  font-weight: 700;
+}
+
+/* Scrollbar Refinement */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.25);
+  border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(0, 0, 0, 0.4);
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+@layer utilities {
+  .text-shadow-glow {
+    text-shadow: 0 0 15px currentColor;
+  }
+}
+
+table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+}
+
+/* Smooth Interactive Elements */
+.interactive {
+  cursor: pointer;
+  transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+.interactive:active {
+  transform: scale(0.98);
+}
+
+/* Hardware acceleration for animations */
+@media (prefers-reduced-motion: no-preference) {
+
+  /* Only apply transitions to interactive elements */
+  button,
+  a,
+  input,
+  .transition-all {
+    transition-property: transform, opacity, background-color, border-color, color, box-shadow;
+    transition-duration: 150ms;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+  }
+}
+
+/* Reduce animations for users who prefer reduced motion */
+@media (prefers-reduced-motion: reduce) {
+
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Optimize rendering for frequently updated elements */
+.data-row {
+  will-change: contents;
+  contain: layout style;
+}
+
+/* Prevent layout thrashing */
+.no-layout-shift {
+  contain: size layout;
+}

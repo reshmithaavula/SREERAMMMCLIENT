@@ -1,0 +1,65 @@
+.tableContainer {
+    width: 100%;
+    overflow-x: auto;
+    /* Remove default card styling since this is often used inside other cards */
+    background: transparent;
+}
+
+.table {
+    width: 100%;
+    border-collapse: collapse;
+    /* Ensure borders meet */
+    border-spacing: 0;
+}
+
+.th {
+    text-align: left;
+    padding: 8px 12px;
+    background: transparent;
+    border-bottom: 2px solid #e5e7eb;
+    /* Stronger header line */
+    color: var(--text-primary);
+    font-weight: 800;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+}
+
+.td {
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+    /* Visible row lines */
+    color: var(--text-primary);
+    font-size: 0.85rem;
+    font-weight: 600;
+}
+
+.tr {
+    transition: background-color 0.1s ease;
+}
+
+.tr:last-child .td {
+    border-bottom: none;
+}
+
+.tr:hover {
+    background-color: rgba(0, 0, 0, 0.02);
+}
+
+/* Custom styles for ticker symbols in tables */
+.tickerCell {
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+/* Data value styling */
+.valueCell {
+    font-variant-numeric: tabular-nums;
+    font-family: inherit;
+}

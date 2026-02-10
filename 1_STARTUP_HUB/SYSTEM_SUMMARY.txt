@@ -1,0 +1,21 @@
+STOCKTRACK UNIFIED CONTROL CENTER
+=================================
+
+This folder contains all the "Engines" and launch scripts needed to run the full StockTrack application.
+
+SCRIPTS:
+--------
+01_MASTER_START.bat      <- START HERE! This opens everything at once.
+02_WEB_DASHBOARD.bat     - Starts the Next.js Dashboard (Frontend).
+03_DATA_ENGINE_TS.bat    - Starts the Live Data Fetcher (Polygon API).
+04_REAL_TIME_LINK.bat    - Starts the WebSocket Stream (Real-Time updates).
+05_LIVE_INDEX_SCRAPER.bat - Starts the Live Nasdaq/BTC Scraper.
+06_ANALYSIS_AGENT.bat    - Starts the AI Movement Analysis.
+07_TRADING_GUI_PYTHON.bat - Starts the original Python GUI.
+
+ORGANIZATION:
+------------
+Everything is now unified to use the same database ('market_v2.db').
+Data flows from the Scrapers/Engines -> Database -> WebSocket -> Dashboard.
+
+Enjoy the unified experience!

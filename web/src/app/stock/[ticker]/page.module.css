@@ -1,0 +1,79 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    gap: 30px;
+}
+
+.header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.ticker {
+    font-size: 3rem;
+    font-weight: 800;
+    color: var(--text-primary);
+}
+
+.priceBlock {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+}
+
+.price {
+    font-size: 2rem;
+    font-weight: 700;
+}
+
+.change {
+    font-size: 1.2rem;
+    font-weight: 500;
+}
+
+.positive {
+    color: var(--accent-green);
+}
+
+.negative {
+    color: var(--accent-red);
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 20px;
+}
+
+.metricRow {
+    display: flex;
+    justify-content: space-between;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+}
+
+.metricRow:last-child {
+    border-bottom: none;
+}
+
+.metricRow span:last-child {
+    color: var(--text-primary);
+    font-weight: 600;
+}
+
+.chartCard {
+    min-height: 400px;
+}
+
+.chartPlaceholder {
+    width: 100%;
+    height: 300px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, 0.02);
+    border-radius: 8px;
+    color: var(--text-secondary);
+}

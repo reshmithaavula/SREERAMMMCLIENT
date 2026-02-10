@@ -1,0 +1,318 @@
+.loginContainer {
+    min-height: 100vh;
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: #f8fafc;
+    font-family: 'Inter', sans-serif;
+    overflow: hidden;
+}
+
+.loginWrapper {
+    width: 100%;
+    max-width: 1100px;
+    min-height: 650px;
+    display: flex;
+    background: white;
+    border-radius: 24px;
+    overflow: hidden;
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.1);
+    margin: 20px;
+}
+
+.brandSection {
+    flex: 1.1;
+    background: linear-gradient(135deg, #d93025 0%, #a51d14 100%);
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    color: white;
+}
+
+.formSection {
+    flex: 1;
+    padding: 60px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    background: white;
+}
+
+/* Decorative Elements */
+.dotsGrid {
+    position: absolute;
+    top: 60px;
+    left: 40px;
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    opacity: 0.3;
+}
+
+.dot {
+    width: 4px;
+    height: 4px;
+    background: white;
+    border-radius: 50%;
+}
+
+.pillShape {
+    position: absolute;
+    top: -20px;
+    right: 15%;
+    width: 40px;
+    height: 120px;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    border-radius: 40px;
+}
+
+.circleLarge {
+    position: absolute;
+    bottom: -100px;
+    left: -50px;
+    width: 300px;
+    height: 300px;
+    border: 40px solid rgba(255, 255, 255, 0.1);
+    border-radius: 50%;
+}
+
+.circleSmall {
+    position: absolute;
+    top: 150px;
+    right: 10%;
+    width: 60px;
+    height: 60px;
+    border: 2px solid rgba(255, 255, 255, 0.5);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.circleSmallInner {
+    width: 8px;
+    height: 8px;
+    background: white;
+    border-radius: 50%;
+}
+
+.floatingDot {
+    position: absolute;
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+}
+
+.contentBox {
+    position: relative;
+    z-index: 10;
+}
+
+.brandTitle {
+    font-size: 3.5rem;
+    font-weight: 900;
+    line-height: 1.1;
+    margin-bottom: 24px;
+    letter-spacing: -2px;
+    text-transform: uppercase;
+}
+
+.brandSubtitle {
+    font-size: 1.1rem;
+    opacity: 0.9;
+    max-width: 400px;
+    line-height: 1.6;
+    font-weight: 500;
+}
+
+/* Form Styling */
+.logoWrapper {
+    margin-bottom: 32px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+.appLogo {
+    width: 64px;
+    height: 64px;
+    background: white;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+    margin-bottom: 16px;
+    border: 1px solid #f1f5f9;
+}
+
+.welcomeText {
+    font-size: 1.75rem;
+    font-weight: 700;
+    color: #1e293b;
+    margin-bottom: 8px;
+}
+
+.inputGroup {
+    margin-bottom: 20px;
+}
+
+.label {
+    display: block;
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: #64748b;
+    margin-bottom: 8px;
+}
+
+.inputWrapper {
+    position: relative;
+}
+
+.inputIcon {
+    position: absolute;
+    left: 16px;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #d93025;
+}
+
+.input {
+    width: 100%;
+    padding: 14px 16px 14px 48px;
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    font-size: 1rem;
+    transition: all 0.2s;
+    color: #1e293b;
+}
+
+.input:focus {
+    border-color: #d93025;
+    box-shadow: 0 0 0 4px rgba(217, 48, 37, 0.1);
+    outline: none;
+}
+
+.formOptions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+}
+
+.checkboxLabel {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.875rem;
+    color: #64748b;
+    cursor: pointer;
+}
+
+.forgotLink {
+    font-size: 0.875rem;
+    color: #d93025;
+    font-weight: 600;
+    text-decoration: none;
+}
+
+.primaryButton {
+    width: 100%;
+    padding: 16px;
+    background: #d93025;
+    color: white;
+    border: none;
+    border-radius: 12px;
+    font-size: 1rem;
+    font-weight: 700;
+    cursor: pointer;
+    transition: all 0.2s;
+    box-shadow: 0 10px 15px -3px rgba(217, 48, 37, 0.3);
+}
+
+.primaryButton:hover {
+    background: #b91c1c;
+    transform: translateY(-1px);
+}
+
+.primaryButton:active {
+    transform: translateY(0);
+}
+
+.divider {
+    display: flex;
+    align-items: center;
+    margin: 32px 0;
+    color: #94a3b8;
+    font-size: 0.875rem;
+}
+
+.divider::before,
+.divider::after {
+    content: "";
+    flex: 1;
+    height: 1px;
+    background: #e2e8f0;
+}
+
+.divider span {
+    padding: 0 16px;
+}
+
+.socialGrid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 16px;
+    margin-bottom: 32px;
+}
+
+.socialButton {
+    height: 54px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: white;
+    border: 1.5px solid #e2e8f0;
+    border-radius: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.socialButton:hover {
+    background: #f8fafc;
+    border-color: #cbd5e1;
+}
+
+.signupText {
+    text-align: center;
+    font-size: 0.875rem;
+    color: #64748b;
+}
+
+.signupLink {
+    color: #d93025;
+    font-weight: 700;
+    text-decoration: none;
+    margin-left: 4px;
+}
+
+@media (max-width: 900px) {
+    .loginWrapper {
+        max-width: 500px;
+        flex-direction: column;
+    }
+
+    .brandSection {
+        display: none;
+    }
+
+    .formSection {
+        padding: 40px 24px;
+    }
+}

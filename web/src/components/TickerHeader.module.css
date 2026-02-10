@@ -1,0 +1,108 @@
+.tickerHeader {
+    width: 100%;
+    background-color: var(--sidebar-bg);
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
+    border-bottom: 1px solid var(--border-color);
+    padding: 0 16px;
+    height: 48px;
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+}
+
+.tickerContainer {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex: 1;
+    min-width: 0;
+    white-space: nowrap;
+    overflow: hidden;
+}
+
+.tickerContainer::-webkit-scrollbar {
+    display: none;
+}
+
+.ticker {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.tickerLabel {
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--text-tertiary);
+    text-transform: uppercase;
+}
+
+.tickerValue {
+    font-size: 0.8rem;
+    font-weight: 700;
+    color: var(--text-primary);
+    font-variant-numeric: tabular-nums;
+}
+
+.changeContainer {
+    display: flex;
+    align-items: center;
+    gap: 2px;
+    font-size: 0.75rem;
+    font-weight: 700;
+}
+
+.changeIcon {
+    flex-shrink: 0;
+}
+
+.changeValue {
+    font-variant-numeric: tabular-nums;
+}
+
+.tickerDivider {
+    width: 1px;
+    height: 14px;
+    background-color: var(--border-color);
+    flex-shrink: 0;
+}
+
+.lastUpdated {
+    margin-left: 16px;
+    font-size: 0.65rem;
+    font-weight: 800;
+    color: var(--accent-blue);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+    flex-shrink: 0;
+}
+
+@media (max-width: 768px) {
+    .tickerHeader {
+        padding: 0 16px 0 72px;
+        /* Add space for hamburger button */
+        height: 56px;
+        /* Slightly taller for better touch targets */
+    }
+
+    .tickerContainer {
+        gap: 16px;
+    }
+
+    .tickerLabel {
+        font-size: 0.6rem;
+    }
+
+    .tickerValue {
+        font-size: 0.8rem;
+    }
+
+    .lastUpdated {
+        display: none;
+    }
+}
