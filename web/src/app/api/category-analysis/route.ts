@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 export async function GET() {
- retrun NextResponse.json({ ok: true })
+    return NextResponse.json({ ok: true })
 }
 import fs from 'fs';
 import path from 'path';
