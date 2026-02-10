@@ -1,8 +1,17 @@
 import { NextResponse } from 'next/server';
+export async function GET() {
+ retrun NextResponse.json({ ok: true })
+}
 import fs from 'fs';
 import path from 'path';
-import { getDb } from '@/lib/db';
+useEffect(() => {
+    fetch('/api/category-analysis')
+        .then(res => res.json())
+        .then(data => {
 
+        });
+}, []);
+})
 interface WatchlistRow {
     Category: string;
     Ticker: string;

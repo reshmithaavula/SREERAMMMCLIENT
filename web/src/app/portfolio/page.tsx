@@ -1,8 +1,7 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import styles from '@/app/page.module.css';
-import { safeSetItem } from '@/lib/storage-utils';
 
 interface Holding {
     ticker: string;
