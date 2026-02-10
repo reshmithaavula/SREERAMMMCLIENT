@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, useMemo } from 'react';
 import styles from '@/app/page.module.css';
 
 interface Holding {
@@ -122,7 +122,7 @@ export default function PortfolioPage() {
     }, [holdings.length]);
 
     // 3. Compute Portfolio Data efficiently
-    const portfolioData = React.useMemo(() => {
+    const portfolioData = useMemo(() => {
         return holdings.map(h => {
             const quote = prices[h.ticker];
             const currentPrice = quote?.price || h.avgPrice || 0;
