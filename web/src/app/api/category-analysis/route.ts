@@ -1,9 +1,10 @@
 import { NextResponse } from 'next/server';
+
+import fs from 'fs';
+import path from 'path';
 export async function GET() {
     return NextResponse.json({ ok: true })
 }
-import fs from 'fs';
-import path from 'path';
 useEffect(() => {
     fetch('/api/category-analysis')
         .then(res => res.json())
