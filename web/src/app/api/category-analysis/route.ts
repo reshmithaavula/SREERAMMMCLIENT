@@ -1,6 +1,4 @@
 import { NextResponse } from 'next/server';
-import fs from 'fs';
-import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
@@ -49,31 +47,28 @@ export async function GET() {
             });
         }
 
-        // Find CSV
-        const possiblePaths = [
-            path.join(process.cwd(), '..', 'Watchlist_New.csv'),
-            path.join(process.cwd(), 'Watchlist_New.csv'),
-        ];
+        // 🔥 Fetch CSV from public folder (Vercel safe)
+        const baseUrl =
+            process.env.VERCEL_URL
+                ? `https://${process.env.VERCEL_URL}`
+                : 'http://localhost:3000';
 
-        let csvContent = '';
+        const response = await fetch(`${baseUrl}/Watchlist_New.csv`);
 
-        for (const csvPath of possiblePaths) {
-            if (fs.existsSync(csvPath)) {
-                csvContent = fs
-                    .readFileSync(csvPath, 'utf-8')
-                    .replace(/^\uFEFF/, '')
-                    .replace(/\r\n/g, '\n')
-                    .replace(/\r/g, '\n');
-                break;
-            }
+        if (!response.ok) {
+            throw new Error('Failed to fetch Watchlist_New.csv');
         }
 
-        if (!csvContent) {
-            throw new Error('Watchlist CSV file not found');
-        }
+        const csvContent = await response.text();
 
         // Parse CSV
-        const lines = csvContent.split('\n').filter(Boolean);
+        const lines = csvContent
+            .replace(/^\uFEFF/, '')
+            .replace(/\r\n/g, '\n')
+            .replace(/\r/g, '\n')
+            .split('\n')
+            .filter(Boolean);
+
         const records: WatchlistRow[] = [];
 
         for (let i = 1; i < lines.length; i++) {
