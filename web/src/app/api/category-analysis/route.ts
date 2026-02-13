@@ -1,21 +1,12 @@
 import { NextResponse } from 'next/server';
+import fs from 'fs';
+import path from 'path';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
-    try {
-        return NextResponse.json({
-            success: true,
-            message: "API working correctly",
-        });
-    } catch (error) {
-        return NextResponse.json(
-            { success: false, error: "Internal Server Error" },
-            { status: 500 }
-        );
-    }
-}
-
+/* =========================
+   Types
+========================= */
 interface WatchlistRow {
     Category: string;
     Ticker: string;
@@ -43,8 +34,6 @@ interface CategoryAnalysis {
 ========================= */
 let cachedData: { data: CategoryAnalysis[]; timestamp: number } | null = null;
 const CACHE_TTL = 0;
-
-export const dynamic = 'force-dynamic';
 
 /* =========================
    API Route
@@ -135,8 +124,10 @@ export async function GET() {
             categories: analyses,
             cached: false,
         });
+
     } catch (error) {
         console.error('Category analysis error:', error);
+
         return NextResponse.json(
             {
                 success: false,
