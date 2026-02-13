@@ -36,7 +36,8 @@ const CACHE_TTL = 0;
 /* =========================
    API Route
 ========================= */
-export async function GET() {
+export async function GET(request: Request) {   // ✅ changed (added request)
+
     try {
         // Return cache if valid
         if (cachedData && Date.now() - cachedData.timestamp < CACHE_TTL) {
@@ -47,13 +48,10 @@ export async function GET() {
             });
         }
 
-        // 🔥 Fetch CSV from public folder (Vercel safe)
-        const baseUrl =
-            process.env.VERCEL_URL
-                ? `https://${process.env.VERCEL_URL}`
-                : 'http://localhost:3000';
-
-        const response = await fetch(`${baseUrl}/Watchlist_New.csv`);
+        // ✅ MINIMUM FIX: use request.url instead of process.env
+        const response = await fetch(
+            new URL('/Watchlist_New.csv', request.url)
+        );
 
         if (!response.ok) {
             throw new Error('Failed to fetch Watchlist_New.csv');
@@ -61,7 +59,7 @@ export async function GET() {
 
         const csvContent = await response.text();
 
-        // Parse CSV
+        // Parse CSV (unchanged logic)
         const lines = csvContent
             .replace(/^\uFEFF/, '')
             .replace(/\r\n/g, '\n')
@@ -82,7 +80,7 @@ export async function GET() {
             });
         }
 
-        // Analyze categories
+        // Analyze categories (unchanged)
         const categoryMap = new Map<string, CategoryAnalysis>();
 
         records.forEach(row => {
