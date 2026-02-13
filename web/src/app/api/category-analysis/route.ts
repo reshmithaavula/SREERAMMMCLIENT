@@ -1,15 +1,21 @@
 import { NextResponse } from 'next/server';
 
+export const dynamic = 'force-dynamic';
+
 export async function GET() {
-    return NextResponse.json({
-        success: true,
-        message: "API working successfully"
-    });
+    try {
+        return NextResponse.json({
+            success: true,
+            message: "API working correctly",
+        });
+    } catch (error) {
+        return NextResponse.json(
+            { success: false, error: "Internal Server Error" },
+            { status: 500 }
+        );
+    }
 }
 
-/* =========================
-   Types
-========================= */
 interface WatchlistRow {
     Category: string;
     Ticker: string;
