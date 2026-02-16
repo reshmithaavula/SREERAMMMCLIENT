@@ -36,7 +36,7 @@ const CACHE_TTL = 0;
 /* =========================
    API Route
 ========================= */
-export async function GET(request: Request) {   // ✅ changed (added request)
+export async function GET(request: Request) {
 
     try {
         // Return cache if valid
@@ -48,7 +48,7 @@ export async function GET(request: Request) {   // ✅ changed (added request)
             });
         }
 
-        // ✅ MINIMUM FIX: use request.url instead of process.env
+        // Fetch CSV from public folder
         const response = await fetch(
             new URL('/Watchlist_New.csv', request.url)
         );
