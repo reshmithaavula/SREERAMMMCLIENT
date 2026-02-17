@@ -1,6 +1,17 @@
 import NextAuth from "next-auth";
-import { authOptions } from "@/lib/auth";
+import { PrismaAdapter } from "@auth/prisma-adapter";
+import { PrismaClient } from "@/generated/prisma";
 
-const handler = NextAuth(authOptions);
+const prisma = new PrismaClient();
 
-export { handler as GET, handler as POST };
+export const { handlers, auth } = NextAuth({
+    adapter: PrismaAdapter(prisma),
+
+    providers: [
+        // your providers here (Google, Credentials, etc.)
+    ],
+
+    session: {
+        strategy: "database",
+    },
+});
