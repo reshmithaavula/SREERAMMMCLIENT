@@ -1,17 +1,18 @@
+export const dynamic = "force-dynamic";
+
 import NextAuth from "next-auth";
 import { PrismaAdapter } from "@auth/prisma-adapter";
-import { PrismaClient } from "@/generated/prisma";
-
+import { PrismaClient } from "@prisma/client";
 const prisma = new PrismaClient();
 
-export const { handlers, auth } = NextAuth({
+const handler = NextAuth({
     adapter: PrismaAdapter(prisma),
-
     providers: [
-        // your providers here (Google, Credentials, etc.)
+        // providers
     ],
-
     session: {
         strategy: "database",
     },
 });
+
+export { handler as GET, handler as POST };
