@@ -1,8 +1,6 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+// Prisma schema for Production (PostgreSQL)
+// Fully serverless-compatible
+// Auth + Market Engine unified in one DB
 
 generator client {
   provider = "prisma-client-js"
@@ -13,6 +11,10 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+//////////////////////////////////////////////////////
+// AUTH MODELS (NextAuth)
+//////////////////////////////////////////////////////
+
 model User {
   id            String    @id @default(cuid())
   name          String?
@@ -22,6 +24,9 @@ model User {
   password      String?
   accounts      Account[]
   sessions      Session[]
+  portfolio     PortfolioHolding[]
+
+  createdAt     DateTime  @default(now())
 }
 
 model Account {
@@ -60,3 +65,63 @@ model VerificationToken {
   @@unique([identifier, token])
 }
 
+//////////////////////////////////////////////////////
+// MARKET ENGINE MODELS (Replaces SQLite + CSV)
+//////////////////////////////////////////////////////
+
+model Watchlist {
+  id        Int      @id @default(autoincrement())
+  ticker    String   @unique
+  category  String?
+  createdAt DateTime @default(now())
+}
+
+model MarketMover {
+  id            Int      @id @default(autoincrement())
+  ticker        String
+  type          String
+  price         Float
+  change        Float?
+  changePercent Float?
+  session       String?
+  commonFlag    Int?
+  prevCloseGap  Float?
+  updatedAt     DateTime @default(now())
+  common_flag    Int?     @default(0)
+  
+}
+
+model News {
+  id        Int      @id @default(autoincrement())
+  headline  String
+  publisher String?
+  ts        DateTime
+  url       String?
+  imageUrl  String?
+  createdAt DateTime @default(now())
+
+  @@index([ts])
+}
+
+model TickerStat {
+  id         Int      @id @default(autoincrement())
+  ticker     String   @unique
+  dma50      Float?
+  dma200     Float?
+  beta       Float?
+  swingRange Float?
+  updatedAt  DateTime @default(now())
+}
+
+model PortfolioHolding {
+  id        Int      @id @default(autoincrement())
+  ticker    String
+  avgCost   Float
+  shares    Float
+  userId    String?
+  createdAt DateTime @default(now())
+
+  user User? @relation(fields: [userId], references: [id])
+
+  @@index([ticker])
+}
