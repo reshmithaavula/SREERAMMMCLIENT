@@ -237,67 +237,73 @@ export default function Dashboard({
             // Avoid multiple connections
             if (wsRef.current?.readyState === WebSocket.OPEN) return;
 
-            const wsUrl = `ws://${window.location.hostname}:3001`;
-            const ws = new WebSocket(wsUrl);
+            // Handle secure vs insecure WebSocket protocol
+            const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:';
+            const wsUrl = `${protocol}//${window.location.hostname}:3001`;
 
-            ws.onopen = () => {
-                console.log('Connected to StockTrack Real-Time Stream');
-            };
+            try {
+                const ws = new WebSocket(wsUrl);
+                wsRef.current = ws;
 
-            ws.onmessage = (event) => {
-                try {
-                    const payload = JSON.parse(event.data);
-                    if (payload.type === 'UPDATE' && payload.data) {
-                        const json = payload.data;
-                        // console.log('Received Real-Time Update', new Date().toLocaleTimeString());
+                ws.onopen = () => {
+                    console.log('Connected to StockTrack Real-Time Stream');
+                };
 
-                        const newData = {
-                            moverData: {
-                                m1: json.m1 || { rippers: [], dippers: [] },
-                                m5: json.m5 || { rippers: [], dippers: [] },
-                                m30: json.m30 || { rippers: [], dippers: [] },
-                                day: json.day || { rippers: [], dippers: [] },
+                ws.onmessage = (event) => {
+                    try {
+                        const payload = JSON.parse(event.data);
+                        if (payload.type === 'UPDATE' && payload.data) {
+                            const json = payload.data;
+                            // console.log('Received Real-Time Update', new Date().toLocaleTimeString());
+
+                            const newData = {
+                                moverData: {
+                                    m1: json.m1 || { rippers: [], dippers: [] },
+                                    m5: json.m5 || { rippers: [], dippers: [] },
+                                    m30: json.m30 || { rippers: [], dippers: [] },
+                                    day: json.day || { rippers: [], dippers: [] },
+                                    news: json.news || [],
+                                    quotes: json.quotes || {},
+                                    watchlist: json.watchlist || []
+                                },
+                                gainers: json.day?.rippers || [],
+                                losers: json.day?.dippers || [],
                                 news: json.news || [],
                                 quotes: json.quotes || {},
                                 watchlist: json.watchlist || []
-                            },
-                            gainers: json.day?.rippers || [],
-                            losers: json.day?.dippers || [],
-                            news: json.news || [],
-                            quotes: json.quotes || {},
-                            watchlist: json.watchlist || []
-                        };
+                            };
 
-                        setGainers(newData.gainers);
-                        setLosers(newData.losers);
-                        setMoverData(newData.moverData);
-                        setNews(newData.news);
-                        setQuotes(newData.quotes);
-                        setWatchlist(newData.watchlist);
-                        if (json.engineStatus) {
-                            setEngineStatus(json.engineStatus);
+                            setGainers(newData.gainers);
+                            setLosers(newData.losers);
+                            setMoverData(newData.moverData);
+                            setNews(newData.news);
+                            setQuotes(newData.quotes);
+                            setWatchlist(newData.watchlist);
+                            if (json.engineStatus) {
+                                setEngineStatus(json.engineStatus);
+                            }
+                            if (json.botStats) {
+                                setBotStatus(json.botStats);
+                            }
                         }
-                        if (json.botStats) {
-                            setBotStatus(json.botStats);
-                        }
+                    } catch (e) {
+                        console.error('WS Message Error:', e);
                     }
-                } catch (e) {
-                    console.error('WS Message Error:', e);
-                }
-            };
+                };
 
-            ws.onclose = () => {
-                // console.log('WS Disconnected, retrying in 2s...');
-                wsRef.current = null;
-                setTimeout(connectWebSocket, 5000);
-            };
+                ws.onclose = () => {
+                    // console.log('WS Disconnected, retrying in 2s...');
+                    wsRef.current = null;
+                    setTimeout(connectWebSocket, 5000);
+                };
 
-            ws.onerror = (err) => {
                 // console.warn('WS Error:', err);
-                ws.close();
-            };
-
-            wsRef.current = ws;
+                if (wsRef.current) {
+                    wsRef.current.close();
+                }
+            } catch (err) {
+                console.error('WebSocket connection error:', err);
+            }
         };
 
         // Start WebSocket connection

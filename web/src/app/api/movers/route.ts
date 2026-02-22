@@ -19,7 +19,21 @@ export async function GET(req: Request) {
         // WATCHLIST CACHE (UNCHANGED)
         // -----------------------
 
-        const csvPath = path.join(process.cwd(), '../Watchlist_New.csv')
+        // Try multiple possible paths for the CSV file on Vercel
+        const csvPaths = [
+            path.join(process.cwd(), '../Watchlist_New.csv'),
+            path.join(process.cwd(), 'public/Watchlist_New.csv'),
+            path.join(process.cwd(), 'Watchlist_New.csv'),
+            path.join(process.cwd(), '.next/server/public/Watchlist_New.csv')
+        ];
+
+        let csvPath = csvPaths[0];
+        for (const p of csvPaths) {
+            if (fs.existsSync(p)) {
+                csvPath = p;
+                break;
+            }
+        }
 
         const CACHE_TTL = 60000
         const getGlobalCache = () => (global as any).watchlistCache
@@ -115,7 +129,7 @@ export async function GET(req: Request) {
             watchlist: [],
             quotes: {},
             news: [],
-            movers: [],
+            movers: common, // Populate movers with common stocks for the CommonListsPage
             sessions: { preMarket: [], regular: [], postMarket: [] },
             engineStatus: {
                 lastUpdate: new Date().toISOString(),

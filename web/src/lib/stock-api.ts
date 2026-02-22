@@ -206,8 +206,9 @@ export async function getWatchlistTickers(): Promise<string[]> {
 
     const possiblePaths = [
         path.join(process.cwd(), '../Watchlist_New.csv'),
-        path.join(process.cwd(), '../../Watchlist_New.csv'),
-        path.join(process.cwd(), 'Watchlist_New.csv')
+        path.join(process.cwd(), 'public/Watchlist_New.csv'),
+        path.join(process.cwd(), 'Watchlist_New.csv'),
+        path.join(process.cwd(), '.next/server/public/Watchlist_New.csv')
     ];
 
     try {
@@ -511,9 +512,23 @@ export async function getCSVPortfolioHoldings(): Promise<any[]> {
     }
 
     try {
-        const csvPath = path.join(process.cwd(), '../portfolio.csv');
-        if (!fs.existsSync(csvPath)) {
-            console.error(`Portfolio CSV not found at ${csvPath}`);
+        const csvPaths = [
+            path.join(process.cwd(), '../portfolio.csv'),
+            path.join(process.cwd(), 'public/portfolio.csv'),
+            path.join(process.cwd(), 'portfolio.csv'),
+            path.join(process.cwd(), '.next/server/public/portfolio.csv')
+        ];
+
+        let csvPath = null;
+        for (const p of csvPaths) {
+            if (fs.existsSync(p)) {
+                csvPath = p;
+                break;
+            }
+        }
+
+        if (!csvPath) {
+            console.error(`Portfolio CSV not found in any of: ${csvPaths.join(', ')}`);
             return [];
         }
 
