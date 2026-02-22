@@ -1,30 +1,25 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        // Use read-write mode (false) to ensure migrations run if they hasn't yet
-        // This creates the 'ticker_stats' table if missing
-        const db = getDb(false);
-
-        // Fetch stats
+        // Fetch stats from Prisma
         let stats: any[] = [];
         try {
-            stats = db.prepare(`
-                SELECT 
-                    ticker, 
-                    dma_50, 
-                    swing_avg, 
-                    beta, 
-                    updated_at 
-                FROM ticker_stats 
-                ORDER BY ticker ASC
-            `).all();
+            const rows = await prisma.tickerStat.findMany({
+                orderBy: { ticker: 'asc' }
+            });
+            stats = rows.map(r => ({
+                ticker: r.ticker,
+                dma_50: r.dma50,
+                swing_avg: r.swingRange,
+                beta: r.beta,
+                updated_at: r.updatedAt
+            }));
         } catch (e: any) {
-            console.warn("ticker_stats table not found or empty:", e.message);
-            // Return empty array
+            console.warn("TickerStat table not found or empty:", e.message);
         }
 
         return NextResponse.json({

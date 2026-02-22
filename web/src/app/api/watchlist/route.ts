@@ -1,5 +1,5 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '../../../lib/db';
+import { prisma } from '@/lib/prisma';
 
 export async function POST(req: Request) {
     try {
@@ -8,11 +8,13 @@ export async function POST(req: Request) {
             return NextResponse.json({ error: 'Ticker is required' }, { status: 400 });
         }
 
-        const db = getDb();
-        const stmt = db.prepare('INSERT OR IGNORE INTO watched_stocks (ticker) VALUES (?)');
-        const info = stmt.run(ticker.toUpperCase());
+        const item = await prisma.watchlist.upsert({
+            where: { ticker: ticker.toUpperCase() },
+            update: {},
+            create: { ticker: ticker.toUpperCase() }
+        });
 
-        if (info.changes > 0) {
+        if (item) {
             return NextResponse.json({ success: true, message: `Added ${ticker}` });
         } else {
             return NextResponse.json({ success: false, message: 'Already exists' });

@@ -26,6 +26,7 @@ model User {
   sessions      Session[]
   portfolio     PortfolioHolding[]
 
+  role          String    @default("user")
   createdAt     DateTime  @default(now())
 }
 
@@ -93,6 +94,7 @@ model MarketMover {
 
 model News {
   id        Int      @id @default(autoincrement())
+  ticker    String?
   headline  String
   publisher String?
   ts        DateTime

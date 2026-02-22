@@ -1,6 +1,6 @@
 import { NextAuthOptions } from "next-auth";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { getDb } from "./db";
+import { prisma } from "./prisma";
 import crypto from "crypto";
 
 // Force reload: 2025-12-25
@@ -34,8 +34,9 @@ export const authOptions: NextAuthOptions = {
 
                 try {
                     console.log(`[AUTH] Attempting login for: ${credentials.email}`);
-                    const db = getDb();
-                    const user = db.prepare("SELECT * FROM users WHERE email = ?").get(credentials.email) as any;
+                    const user = await prisma.user.findUnique({
+                        where: { email: credentials.email }
+                    });
 
                     if (!user) {
                         console.log(`[AUTH] User not found: ${credentials.email}`);
@@ -55,11 +56,16 @@ export const authOptions: NextAuthOptions = {
                     }
 
                     // Emergency Fallback: If no owner exists in the DB, make the first person who logs in the owner
-                    let currentRole = user.role || 'user';
+                    let currentRole = (user as any).role || 'user';
                     try {
-                        const ownerExists = db.prepare("SELECT 1 FROM users WHERE role = 'owner' LIMIT 1").get();
+                        const ownerExists = await prisma.user.findFirst({
+                            where: { role: 'owner' }
+                        });
                         if (!ownerExists) {
-                            db.prepare("UPDATE users SET role = 'owner' WHERE id = ?").run(user.id);
+                            await prisma.user.update({
+                                where: { id: user.id },
+                                data: { role: 'owner' }
+                            });
                             currentRole = 'owner';
                             console.log(`[AUTH] No owner found in DB. Auto-promoted ${user.email} to owner.`);
                         }
@@ -89,11 +95,18 @@ export const authOptions: NextAuthOptions = {
         async signIn({ user, account, profile }) {
             if (account?.provider === "google") {
                 try {
-                    const db = getDb();
-                    const existingUser = db.prepare("SELECT * FROM users WHERE email = ?").get(user.email);
+                    const existingUser = await prisma.user.findUnique({
+                        where: { email: user.email as string }
+                    });
                     if (!existingUser) {
-                        db.prepare("INSERT INTO users (name, email, image, role) VALUES (?, ?, ?, 'user')")
-                            .run(user.name, user.email, user.image);
+                        await prisma.user.create({
+                            data: {
+                                name: user.name,
+                                email: user.email,
+                                image: user.image,
+                                role: 'user'
+                            }
+                        });
                     }
                     return true;
                 } catch (e) {

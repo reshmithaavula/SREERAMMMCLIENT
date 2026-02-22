@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import { getPennyStocks, LiveQuote } from '@/lib/stock-api';
-import { getDb } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
@@ -11,13 +11,16 @@ export async function GET() {
         const pennyTickers = stocks.map(s => s.ticker);
         const tickerSet = new Set(pennyTickers);
 
-        // 2. Open DB to fetch movers for these specific tickers
-        const db = getDb(true);
+        // 2. Fetch movers for these specific tickers from Prisma
         let moversRows: any[] = [];
         try {
-            moversRows = db.prepare('SELECT * FROM market_movers').all() as any[];
+            moversRows = await prisma.marketMover.findMany({
+                where: {
+                    ticker: { in: pennyTickers }
+                }
+            });
         } catch (e: any) {
-            console.error("[API Penny] Failed to fetch market_movers:", e.message);
+            console.error("[API Penny] Failed to fetch market_movers from Prisma:", e.message);
         }
 
         // 3. Map into categories but ONLY for penny stocks
@@ -29,7 +32,7 @@ export async function GET() {
         moversRows.forEach(row => {
             if (!tickerSet.has(row.ticker)) return;
 
-            const changePct = row.change_percent || 0;
+            const changePct = row.changePercent || 0;
             const price = row.price || 0;
             const change = row.change || 0;
 
@@ -57,18 +60,19 @@ export async function GET() {
                 return desc ? (valB - valA) : (valA - valB);
             });
 
-        // 4. Get engine status from 'stks' latest entry
+        // 4. Get engine status (simulated using updatedAt from movers since 'stks' might be separate)
         let engineStatus = { isLive: false, statusText: 'Offline', statusColor: 'red', lastUpdate: new Date().toISOString() };
         try {
-            const latestTsRow = db.prepare('SELECT MAX(ts) as ts FROM stks').get() as any;
-            if (latestTsRow?.ts) {
-                const cleanTs = latestTsRow.ts.replace(/(\.\d{3})\d+/, '$1');
-                const latency = Date.now() - new Date(cleanTs).getTime();
+            const latestMover = await prisma.marketMover.findFirst({
+                orderBy: { updatedAt: 'desc' }
+            });
+            if (latestMover?.updatedAt) {
+                const latency = Date.now() - latestMover.updatedAt.getTime();
                 engineStatus = {
                     isLive: latency < 120000,
                     statusText: latency < 60000 ? 'Live' : (latency < 120000 ? 'Delayed' : 'Offline'),
                     statusColor: latency < 60000 ? 'green' : (latency < 120000 ? 'orange' : 'red'),
-                    lastUpdate: cleanTs
+                    lastUpdate: latestMover.updatedAt.toISOString()
                 };
             }
         } catch (e) { }

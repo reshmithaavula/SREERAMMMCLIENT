@@ -1,19 +1,19 @@
 import { NextResponse } from 'next/server';
-import { getDb } from '@/lib/db';
+import { prisma } from '@/lib/prisma';
 
 export const dynamic = 'force-dynamic';
 
 export async function GET() {
     try {
-        const db = getDb();
-        const news = db.prepare(`
-            SELECT id, headline, publisher, ts as time, url 
-            FROM news 
-            ORDER BY ts DESC 
-            LIMIT 4
-        `).all();
+        const news = await prisma.news.findMany({
+            orderBy: { ts: 'desc' },
+            take: 4
+        });
 
-        return NextResponse.json(news);
+        return NextResponse.json(news.map(n => ({
+            ...n,
+            time: n.ts
+        })));
     } catch (e) {
         return NextResponse.json([]);
     }

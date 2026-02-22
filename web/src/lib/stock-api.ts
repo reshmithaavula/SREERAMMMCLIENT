@@ -1,5 +1,5 @@
 // @ts-ignore
-import { getDb } from './db';
+import { prisma } from './prisma';
 import { unstable_cache } from 'next/cache';
 // No fallback imports - we only show real data now
 
@@ -238,7 +238,6 @@ export async function getWatchlistTickers(): Promise<string[]> {
 }
 
 export async function getRealTimeMovers(timeframe: '1m' | '5m' | '30m' | 'day' = 'day'): Promise<{ rippers: any[], dippers: any[] }> {
-    const db = getDb();
     const prefix = timeframe === 'day' ? 'day' : timeframe;
     const ripType = `${prefix}_ripper`;
     const dipType = `${prefix}_dipper`;
@@ -247,23 +246,25 @@ export async function getRealTimeMovers(timeframe: '1m' | '5m' | '30m' | 'day' =
     if (tickers.length === 0) return { rippers: [], dippers: [] };
 
     try {
-        // Optimization: Filter by tickers in SQL to reduce data transfer and processing
-        const placeholders = tickers.map(() => '?').join(',');
-        const query = `
-            SELECT ticker, price, change, change_percent as changePercent, updated_at, common_flag, prev_close_gap 
-            FROM market_movers 
-            WHERE type IN (?, ?) AND ticker IN (${placeholders})
-            ORDER BY ABS(change_percent) DESC
-        `;
+        const rows = await prisma.marketMover.findMany({
+            where: {
+                type: { in: [ripType, dipType] },
+                ticker: { in: tickers }
+            },
+            orderBy: {
+                changePercent: 'desc'
+            }
+        });
 
-        const rows = db.prepare(query).all(ripType, dipType, ...tickers) as any[];
+        const rippers = rows.filter(r => (r.changePercent || 0) > 0).slice(0, 50);
+        const dippers = rows.filter(r => (r.changePercent || 0) < 0).sort((a, b) => (a.changePercent || 0) - (b.changePercent || 0)).slice(0, 50);
 
-        const rippers = rows.filter(r => r.changePercent > 0).sort((a, b) => b.changePercent - a.changePercent).slice(0, 50);
-        const dippers = rows.filter(r => r.changePercent < 0).sort((a, b) => a.changePercent - b.changePercent).slice(0, 50);
-
-        return { rippers, dippers };
+        return {
+            rippers: rippers.map(r => ({ ...r, change_percent: r.changePercent })),
+            dippers: dippers.map(r => ({ ...r, change_percent: r.changePercent }))
+        };
     } catch (e) {
-        console.error('Error reading movers from DB:', e);
+        console.error('Error reading movers from Prisma:', e);
         return { rippers: [], dippers: [] };
     }
 }
@@ -311,22 +312,20 @@ export async function getPennyStocks(limit: number = 200): Promise<any[]> {
         const quotes = await getLiveQuotes(uniqueTickers);
 
         // Fetch Momentum from DB to augment
-        const db = getDb();
         const momentumMap: Record<string, any> = {};
         try {
-            const tickersStr = uniqueTickers.map(t => `'${t}'`).join(',');
-            const movers = db.prepare(`
-                SELECT ticker, type, change_percent 
-                FROM market_movers 
-                WHERE ticker IN (${tickersStr})
-            `).all() as any[];
+            const movers = await prisma.marketMover.findMany({
+                where: {
+                    ticker: { in: uniqueTickers }
+                }
+            });
 
             movers.forEach(m => {
                 if (!momentumMap[m.ticker]) momentumMap[m.ticker] = {};
-                momentumMap[m.ticker][m.type] = m.change_percent;
+                momentumMap[m.ticker][m.type] = m.changePercent;
             });
         } catch (e) {
-            console.warn("[PennyAPI] DB Momentum fetch failed (DB locked?), continuing with live quotes only");
+            console.warn("[PennyAPI] Prisma Momentum fetch failed, continuing with live quotes only");
         }
 
         const result = tickerData.map((data, i) => {
@@ -434,8 +433,9 @@ export async function getCSVWatchlistStocks(limit: number = 200): Promise<any[]>
 
         // Add stocks from DB
         try {
-            const db = getDb();
-            const dbTickers = db.prepare('SELECT ticker FROM watched_stocks').all() as any[];
+            const dbTickers = await prisma.watchlist.findMany({
+                select: { ticker: true }
+            });
             dbTickers.forEach(r => {
                 if (r.ticker) tickerData.push({ category: 'User Added', ticker: r.ticker });
             });
@@ -445,19 +445,17 @@ export async function getCSVWatchlistStocks(limit: number = 200): Promise<any[]>
         const quotes = await getLiveQuotes(uniqueTickers);
 
         // Fetch Real Momentum from DB
-        const db = getDb();
         const momentumMap: Record<string, any> = {};
         try {
-            const tickersStr = uniqueTickers.map(t => `'${t}'`).join(',');
-            const movers = db.prepare(`
-                SELECT ticker, type, change_percent 
-                FROM market_movers 
-                WHERE ticker IN (${tickersStr})
-            `).all() as any[];
+            const movers = await prisma.marketMover.findMany({
+                where: {
+                    ticker: { in: uniqueTickers }
+                }
+            });
 
             movers.forEach(m => {
                 if (!momentumMap[m.ticker]) momentumMap[m.ticker] = {};
-                momentumMap[m.ticker][m.type] = m.change_percent;
+                momentumMap[m.ticker][m.type] = m.changePercent;
             });
         } catch (e) { }
 
@@ -596,17 +594,16 @@ export async function getTopOptions(): Promise<any[]> {
 
 export async function getMarketNews(limit: number = 10): Promise<any[]> {
     // Read from DB news table
-    const db = getDb();
     try {
-        const rows = db.prepare(`
-            SELECT id, headline, author, publisher, ts as time, url, image_url as image 
-            FROM news 
-            ORDER BY ts DESC 
-            LIMIT ?
-        `).all(limit) as any[];
+        const rows = await prisma.news.findMany({
+            orderBy: { ts: 'desc' },
+            take: limit
+        });
 
         return rows.map(r => ({
             ...r,
+            time: r.ts,
+            image: r.imageUrl,
             sentiment: 'neutral'
         }));
     } catch (e) {
